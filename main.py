@@ -1,6 +1,7 @@
 import pygame
 import sys
 import math
+import time
 
 
 class Snake:
@@ -11,27 +12,36 @@ class Snake:
         self.y = 100
         self.WHITE = (255, 255, 255)
         self.MAGENTA = (142, 63, 255)
+        self.direction = 'down'
 
     def move_left(self):
-        self.x -= 10
-        self.draw()
+        self.direction = "left"
 
     def move_right(self):
-        self.x += 10
-        self.draw()
+        self.direction = "right"
 
     def move_up(self):
-        self.y -= 10
-        self.draw()
+        self.direction = "up"
 
     def move_down(self):
-        self.y += 10
-        self.draw()
+        self.direction = "down"
 
     def draw(self):
         self.parent_screen.fill(self.MAGENTA)
         self.parent_screen.blit(self.block, (self.x, self.y))
         pygame.display.flip()
+
+    def walk(self):
+        if self.direction == "left":
+            self.x -= 10
+        if self.direction == "right":
+            self.x += 10
+        if self.direction == "up":
+            self.y -= 10
+        if self.direction == "down":
+            self.y += 10
+
+        self.draw()
 
 
 class Game:
@@ -78,6 +88,9 @@ class Game:
                     running = False
                     self.game_quit()
             self.scale_window()
+
+            self.snake.walk()
+            time.sleep(0.05)
 
 
 if __name__ == "__main__":
