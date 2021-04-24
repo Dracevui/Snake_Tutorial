@@ -23,8 +23,7 @@ def update_score(score, hi_score):
 
 class Apple:
     def __init__(self, parent_screen):
-        # self.image = pygame.image.load("resources/apple.png").convert_alpha()
-        self.image = pygame.transform.scale((pygame.image.load("resources/aight.png").convert_alpha()), (40, 40))
+        self.image = pygame.image.load("resources/apple.png").convert_alpha()
         self.crunch = pygame.mixer.Sound("resources/crunch.wav")
         self.parent_screen = parent_screen
         self.x = SIZE * 3
@@ -124,6 +123,10 @@ class Assets:
         self.press_spacebar_surface = pygame.image.load("resources/press_spacebar.png")
         self.press_spacebar_rect = self.press_spacebar_surface.get_rect(center=(500, 80))
         self.icon = pygame.image.load("resources/icon.png")
+        self.bgm = pygame.mixer.Sound("resources/bgm.wav")
+
+    def play_bgm(self):
+        self.bgm.play(-1)
 
 
 class Game:
@@ -225,6 +228,7 @@ class Game:
             self.DUMMY_WINDOW.blit(hi_score, hi_score_rect)
 
     def run(self):
+        self.assets.play_bgm()
         while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
