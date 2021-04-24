@@ -23,7 +23,7 @@ def update_score(score, hi_score):
 
 class Apple:
     def __init__(self, parent_screen):
-        self.image = pygame.image.load("resources/apple.png").convert_alpha()
+        self.image = pygame.transform.scale((pygame.image.load("resources/pizza.png").convert_alpha()), (40, 40))
         self.crunch = pygame.mixer.Sound("resources/crunch.wav")
         self.parent_screen = parent_screen
         self.x = SIZE * 3
@@ -117,10 +117,10 @@ class Snake:
 
 class Assets:
     def __init__(self):
-        self.background = pygame.image.load("resources/background.png")
+        self.background = pygame.transform.scale((pygame.image.load("resources/water_background.png")), (1000, 800))
         self.game_over = pygame.image.load("resources/game_over.png")
         self.game_over_rect = self.game_over.get_rect(center=(500, 400))
-        self.press_spacebar_surface = pygame.image.load("resources/press_spacebar.png")
+        self.press_spacebar_surface = pygame.image.load("resources/press_spacebar2.png")
         self.press_spacebar_rect = self.press_spacebar_surface.get_rect(center=(500, 80))
         self.icon = pygame.image.load("resources/icon.png")
         self.bgm = pygame.mixer.Sound("resources/bgm.wav")
