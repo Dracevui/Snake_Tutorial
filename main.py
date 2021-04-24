@@ -3,13 +3,28 @@ import sys
 import math
 import time
 
+SIZE = 40
+
+
+class Apple:
+    def __init__(self, parent_screen):
+        self.image = pygame.image.load("resources/apple.jpg").convert()
+        self.parent_screen = parent_screen
+        self.x = SIZE * 3
+        self.y = SIZE * 3
+
+    def draw(self):
+        self.parent_screen.blit(self.image, (self.x, self.y))
+        pygame.display.flip()
+
 
 class Snake:
-    def __init__(self, parent_screen):
+    def __init__(self, parent_screen, length):
+        self.length = length
         self.parent_screen = parent_screen
         self.block = pygame.image.load("resources/block.jpg").convert()
-        self.x = 100
-        self.y = 100
+        self.x = [SIZE] * length
+        self.y = [SIZE] * length
         self.WHITE = (255, 255, 255)
         self.MAGENTA = (142, 63, 255)
         self.direction = 'down'
@@ -28,18 +43,24 @@ class Snake:
 
     def draw(self):
         self.parent_screen.fill(self.MAGENTA)
-        self.parent_screen.blit(self.block, (self.x, self.y))
+        for i in range(self.length):
+            self.parent_screen.blit(self.block, (self.x[i], self.y[i]))
         pygame.display.flip()
 
     def walk(self):
+
+        for i in range(self.length-1, 0, -1):
+            self.x[i] = self.x[i - 1]
+            self.y[i] = self.y[i - 1]
+
         if self.direction == "left":
-            self.x -= 10
+            self.x[0] -= SIZE
         if self.direction == "right":
-            self.x += 10
+            self.x[0] += SIZE
         if self.direction == "up":
-            self.y -= 10
+            self.y[0] -= SIZE
         if self.direction == "down":
-            self.y += 10
+            self.y[0] += SIZE
 
         self.draw()
 
@@ -48,15 +69,22 @@ class Game:
     def __init__(self):
         pygame.init()
         self.MONITOR = pygame.display.Info()
-        self.SCREEN_DIMENSIONS = (math.ceil(self.MONITOR.current_w * 0.26), math.floor(self.MONITOR.current_h * 0.463))
+        self.SCREEN_DIMENSIONS = (math.ceil(self.MONITOR.current_w * 0.5206), math.ceil(self.MONITOR.current_h * 0.74))
         self.WINDOW = pygame.display.set_mode(self.SCREEN_DIMENSIONS)
-        self.DUMMY_WINDOW = pygame.Surface((500, 500))
+        self.DUMMY_WINDOW = pygame.Surface((1000, 800))
         self.WIDTH, HEIGHT = self.SCREEN_DIMENSIONS
         self.WINDOW_WIDTH = self.WINDOW.get_width()
         self.WINDOW_HEIGHT = self.WINDOW.get_height()
 
-        self.snake = Snake(self.DUMMY_WINDOW)
+        self.snake = Snake(self.DUMMY_WINDOW, 4)
         self.snake.draw()
+
+        self.apple = Apple(self.DUMMY_WINDOW)
+        self.apple.draw()
+
+    def play(self):
+        self.snake.walk()
+        self.apple.draw()
 
     def scale_window(self):  # Scales the game window and assets to fit the user's monitor dimensions
         frame = pygame.transform.scale(self.DUMMY_WINDOW, self.SCREEN_DIMENSIONS)
@@ -89,8 +117,9 @@ class Game:
                     self.game_quit()
             self.scale_window()
 
-            self.snake.walk()
-            time.sleep(0.05)
+            self.play()
+
+            time.sleep(0.15)
 
 
 if __name__ == "__main__":
