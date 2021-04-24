@@ -2,13 +2,14 @@ import pygame
 import sys
 import math
 import time
+import random
 
 SIZE = 40
 
 
 class Apple:
     def __init__(self, parent_screen):
-        self.image = pygame.image.load("resources/apple.jpg").convert()
+        self.image = pygame.image.load("resources/apple.png").convert_alpha()
         self.parent_screen = parent_screen
         self.x = SIZE * 3
         self.y = SIZE * 3
@@ -16,6 +17,10 @@ class Apple:
     def draw(self):
         self.parent_screen.blit(self.image, (self.x, self.y))
         pygame.display.flip()
+
+    def move(self):
+        self.x = random.randint(0, 24) * SIZE
+        self.y = random.randint(0, 19) * SIZE
 
 
 class Snake:
@@ -28,6 +33,11 @@ class Snake:
         self.WHITE = (255, 255, 255)
         self.MAGENTA = (142, 63, 255)
         self.direction = 'down'
+
+    def increase_length(self):
+        self.length += 1
+        self.x.append(-1)
+        self.y.append(-1)
 
     def move_left(self):
         self.direction = "left"
@@ -75,16 +85,27 @@ class Game:
         self.WIDTH, HEIGHT = self.SCREEN_DIMENSIONS
         self.WINDOW_WIDTH = self.WINDOW.get_width()
         self.WINDOW_HEIGHT = self.WINDOW.get_height()
+        self.WHITE = (255, 255, 255)
 
-        self.snake = Snake(self.DUMMY_WINDOW, 4)
+        self.snake = Snake(self.DUMMY_WINDOW, 1)
         self.snake.draw()
 
         self.apple = Apple(self.DUMMY_WINDOW)
         self.apple.draw()
 
+    def check_apple_collision(self, x1, y1, x2, y2):
+        if x2 <= x1 < x2 + SIZE and y2 <= y1 < y2 + SIZE:
+            return True
+        return False
+
     def play(self):
         self.snake.walk()
+        if self.check_apple_collision(self.snake.x[0], self.snake.y[0], self.apple.x, self.apple.y):
+            self.snake.increase_length()
+            self.apple.move()
         self.apple.draw()
+        self.display_score()
+        pygame.display.flip()
 
     def scale_window(self):  # Scales the game window and assets to fit the user's monitor dimensions
         frame = pygame.transform.scale(self.DUMMY_WINDOW, self.SCREEN_DIMENSIONS)
@@ -95,6 +116,13 @@ class Game:
     def game_quit():
         pygame.quit()
         sys.exit()
+
+    def display_score(self):
+        font = pygame.font.SysFont('arial', 30)
+        score = font.render(f"Score: {self.snake.length}", True, self.WHITE)
+        score_rect = score.get_rect(topright=(990, 10))
+        self.DUMMY_WINDOW.blit(score, score_rect)
+        pygame.display.flip()
 
     def run(self):
         running = True
@@ -115,11 +143,12 @@ class Game:
                 if event.type == pygame.QUIT:
                     running = False
                     self.game_quit()
-            self.scale_window()
 
             self.play()
 
             time.sleep(0.15)
+
+            self.scale_window()
 
 
 if __name__ == "__main__":
