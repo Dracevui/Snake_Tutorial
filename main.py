@@ -1,7 +1,6 @@
 import pygame
 import sys
 import math
-import time
 import random
 
 SIZE = 40
@@ -15,7 +14,8 @@ def update_score(score, hi_score):
 
 class Apple:
     def __init__(self, parent_screen):
-        self.image = pygame.image.load("resources/apple.png").convert_alpha()
+        # self.image = pygame.image.load("resources/apple.png").convert_alpha()
+        self.image = pygame.transform.scale((pygame.image.load("resources/aight.png").convert_alpha()), (40, 40))
         self.crunch = pygame.mixer.Sound("resources/crunch.wav")
         self.parent_screen = parent_screen
         self.x = SIZE * 3
@@ -43,6 +43,10 @@ class Snake:
         self.WHITE = (255, 255, 255)
         self.MAGENTA = (142, 63, 255)
         self.direction = 'down'
+        self.north = False
+        self.south = False
+        self.east = False
+        self.west = False
 
     def increase_length(self):
         self.length += 1
@@ -50,16 +54,36 @@ class Snake:
         self.y.append(-1)
 
     def move_left(self):
-        self.direction = "left"
+        if not self.east:
+            self.direction = "left"
+            self.north = False
+            self.south = False
+            self.east = False
+            self.west = True
 
     def move_right(self):
-        self.direction = "right"
+        if not self.west:
+            self.direction = "right"
+            self.north = False
+            self.south = False
+            self.east = True
+            self.west = False
 
     def move_up(self):
-        self.direction = "up"
+        if not self.south:
+            self.direction = "up"
+            self.north = True
+            self.south = False
+            self.east = False
+            self.west = False
 
     def move_down(self):
-        self.direction = "down"
+        if not self.north:
+            self.direction = "down"
+            self.north = False
+            self.south = True
+            self.east = False
+            self.west = False
 
     def draw(self):
         for i in range(self.length):
