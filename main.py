@@ -7,12 +7,6 @@ import random
 SIZE = 40
 
 
-def check_collision(x1, y1, x2, y2):
-    if x2 <= x1 < x2 + SIZE and y2 <= y1 < y2 + SIZE:
-        return True
-    return False
-
-
 def update_score(score, hi_score):
     if score > hi_score:
         hi_score = score
@@ -22,6 +16,7 @@ def update_score(score, hi_score):
 class Apple:
     def __init__(self, parent_screen):
         self.image = pygame.image.load("resources/apple.png").convert_alpha()
+        self.crunch = pygame.mixer.Sound("resources/crunch.wav")
         self.parent_screen = parent_screen
         self.x = SIZE * 3
         self.y = SIZE * 3
@@ -33,6 +28,9 @@ class Apple:
     def move(self):
         self.x = random.randint(0, 24) * SIZE
         self.y = random.randint(0, 19) * SIZE
+
+    def play_sound(self):
+        pygame.mixer.Channel(1).play(self.crunch)
 
 
 class Snake:
@@ -90,11 +88,16 @@ class Assets:
         self.background = pygame.image.load("resources/background.png")
         self.game_over = pygame.image.load("resources/game_over.png")
         self.game_over_rect = self.game_over.get_rect(center=(500, 400))
+        self.press_spacebar_surface = pygame.image.load("resources/press_spacebar.png")
+        self.press_spacebar_rect = self.press_spacebar_surface.get_rect(center=(500, 80))
+        self.icon = pygame.image.load("resources/icon.png")
 
 
 class Game:
     def __init__(self):
+        # Game Initialisation
         pygame.init()
+        pygame.display.set_caption("Blockey Snakey")
 
         # Game Constants
         self.MONITOR = pygame.display.Info()
@@ -106,11 +109,14 @@ class Game:
         self.WINDOW_HEIGHT = self.WINDOW.get_height()
         self.FONT = pygame.font.SysFont('Impact', 50)
         self.WHITE = (255, 255, 255)
+        self.CLOCK = pygame.time.Clock()
+        self.FPS = 10
 
         # Class Imports
         self.snake = Snake(self.DUMMY_WINDOW, 1)
         self.apple = Apple(self.DUMMY_WINDOW)
         self.assets = Assets()
+        pygame.display.set_icon(self.assets.icon)
 
         # Game Variables
         self.running = True
@@ -133,6 +139,7 @@ class Game:
                     self.game_clear()
             self.DUMMY_WINDOW.blit(self.assets.background, (0, 0))
             self.DUMMY_WINDOW.blit(self.assets.game_over, self.assets.game_over_rect)
+            self.DUMMY_WINDOW.blit(self.assets.press_spacebar_surface, self.assets.press_spacebar_rect)
             self.display_score()
             self.scale_window()
 
@@ -143,17 +150,23 @@ class Game:
         self.DUMMY_WINDOW.blit(self.assets.background, (0, 0))
         self.snake.walk()
         
-        if check_collision(self.snake.x[0], self.snake.y[0], self.apple.x, self.apple.y):
+        if self.check_collision(self.snake.x[0], self.snake.y[0], self.apple.x, self.apple.y):
             self.snake.increase_length()
             self.apple.move()
             
         for i in range(3, self.snake.length):
-            if check_collision(self.snake.x[0], self.snake.y[0], self.snake.x[i], self.snake.y[i]):
+            if self.check_collision(self.snake.x[0], self.snake.y[0], self.snake.x[i], self.snake.y[i]):
                 self.game_over()
 
         self.display_score()
         self.apple.draw()
         pygame.display.flip()
+
+    def check_collision(self, x1, y1, x2, y2):
+        if x2 <= x1 < x2 + SIZE and y2 <= y1 < y2 + SIZE:
+            self.apple.play_sound()
+            return True
+        return False
 
     def scale_window(self):  # Scales the game window and assets to fit the user's monitor dimensions
         frame = pygame.transform.scale(self.DUMMY_WINDOW, self.SCREEN_DIMENSIONS)
@@ -167,7 +180,7 @@ class Game:
 
     def display_score(self):
         score = self.FONT.render(f"Score: {self.snake.length - 1}", True, self.WHITE)
-        score_rect = score.get_rect(topright=(990, 10))
+        score_rect = score.get_rect(topright=(990, 735))
 
         hi_score = self.FONT.render(f"High Score: {self.high_score}", True, self.WHITE)
         hi_score_rect = hi_score.get_rect(center=(500, 700))
@@ -199,9 +212,9 @@ class Game:
             if self.game_active:
                 self.play()
 
-                time.sleep(0.15)
-
             self.scale_window()
+
+            self.CLOCK.tick(self.FPS)
 
 
 if __name__ == "__main__":
