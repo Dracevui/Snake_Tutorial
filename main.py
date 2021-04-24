@@ -7,6 +7,18 @@ import random
 SIZE = 40
 
 
+def check_collision(x1, y1, x2, y2):
+    if x2 <= x1 < x2 + SIZE and y2 <= y1 < y2 + SIZE:
+        return True
+    return False
+
+
+def update_score(score, hi_score):
+    if score > hi_score:
+        hi_score = score
+    return hi_score
+
+
 class Apple:
     def __init__(self, parent_screen):
         self.image = pygame.image.load("resources/apple.png").convert_alpha()
@@ -52,7 +64,7 @@ class Snake:
         self.direction = "down"
 
     def draw(self):
-        self.parent_screen.fill(self.MAGENTA)
+        # self.parent_screen.fill(self.MAGENTA)
         for i in range(self.length):
             self.parent_screen.blit(self.block, (self.x[i], self.y[i]))
         pygame.display.flip()
@@ -75,9 +87,18 @@ class Snake:
         self.draw()
 
 
+class Assets:
+    def __init__(self):
+        self.background = pygame.image.load("resources/background.png")
+        self.game_over = pygame.image.load("resources/game_over.png")
+        self.game_over_rect = self.game_over.get_rect(center=(500, 400))
+
+
 class Game:
     def __init__(self):
         pygame.init()
+
+        # Game Constants
         self.MONITOR = pygame.display.Info()
         self.SCREEN_DIMENSIONS = (math.ceil(self.MONITOR.current_w * 0.5206), math.ceil(self.MONITOR.current_h * 0.74))
         self.WINDOW = pygame.display.set_mode(self.SCREEN_DIMENSIONS)
@@ -85,24 +106,49 @@ class Game:
         self.WIDTH, HEIGHT = self.SCREEN_DIMENSIONS
         self.WINDOW_WIDTH = self.WINDOW.get_width()
         self.WINDOW_HEIGHT = self.WINDOW.get_height()
+        self.font = pygame.font.SysFont('arial', 30)
         self.WHITE = (255, 255, 255)
 
-        self.snake = Snake(self.DUMMY_WINDOW, 1)
-        self.snake.draw()
+        # Game Variables
+        self.running = True
+        self.game_active = True
+        self.high_score = 0
 
+        # Class Imports
+        self.snake = Snake(self.DUMMY_WINDOW, 1)
         self.apple = Apple(self.DUMMY_WINDOW)
+        self.assets = Assets()
+
+        # Onscreen Drawings
+        self.snake.draw()
         self.apple.draw()
 
-    def check_apple_collision(self, x1, y1, x2, y2):
-        if x2 <= x1 < x2 + SIZE and y2 <= y1 < y2 + SIZE:
-            return True
-        return False
+    def game_over(self):
+        self.game_active = False
+        while not self.game_active:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE or event.type == pygame.QUIT:
+                    self.running = False
+                    self.game_quit()
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                    self.game_active = True
+            self.DUMMY_WINDOW.blit(self.assets.background, (0, 0))
+            self.DUMMY_WINDOW.blit(self.assets.game_over, self.assets.game_over_rect)
+            self.display_score()
+            self.scale_window()
 
     def play(self):
+        self.DUMMY_WINDOW.blit(self.assets.background, (0, 0))
         self.snake.walk()
-        if self.check_apple_collision(self.snake.x[0], self.snake.y[0], self.apple.x, self.apple.y):
+        
+        if check_collision(self.snake.x[0], self.snake.y[0], self.apple.x, self.apple.y):
             self.snake.increase_length()
             self.apple.move()
+            
+        for i in range(3, self.snake.length):
+            if check_collision(self.snake.x[0], self.snake.y[0], self.snake.x[i], self.snake.y[i]):
+                self.game_over()
+    
         self.apple.draw()
         self.display_score()
         pygame.display.flip()
@@ -118,19 +164,23 @@ class Game:
         sys.exit()
 
     def display_score(self):
-        font = pygame.font.SysFont('arial', 30)
-        score = font.render(f"Score: {self.snake.length}", True, self.WHITE)
+        score = self.font.render(f"Score: {self.snake.length}", True, self.WHITE)
         score_rect = score.get_rect(topright=(990, 10))
+
+        hi_score = self.font.render(f"High Score: {self.high_score}", True, self.WHITE)
+        hi_score_rect = hi_score.get_rect(center=(500, 700))
+        
+        self.high_score = update_score(self.snake.length, self.high_score)
+
         self.DUMMY_WINDOW.blit(score, score_rect)
-        pygame.display.flip()
+        if not self.game_active:
+            self.DUMMY_WINDOW.blit(hi_score, hi_score_rect)
 
     def run(self):
-        running = True
-
-        while running:
+        while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                    running = False
+                    self.running = False
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_UP:
                         self.snake.move_up()
@@ -141,12 +191,13 @@ class Game:
                     if event.key == pygame.K_RIGHT:
                         self.snake.move_right()
                 if event.type == pygame.QUIT:
-                    running = False
+                    self.running = False
                     self.game_quit()
 
-            self.play()
+            if self.game_active:
+                self.play()
 
-            time.sleep(0.15)
+                time.sleep(0.15)
 
             self.scale_window()
 
