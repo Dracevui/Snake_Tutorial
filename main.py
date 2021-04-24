@@ -6,6 +6,15 @@ import random
 SIZE = 40
 
 
+def screen_dimensions(x, y):
+    monitor = pygame.display.Info()
+    base_x, base_y = 1920, 1080
+    target_x = x / base_x
+    target_y = y / base_y
+    final_x, final_y = math.ceil(monitor.current_w * target_x), math.ceil(monitor.current_h * target_y)
+    return final_x, final_y
+
+
 def update_score(score, hi_score):
     if score > hi_score:
         hi_score = score
@@ -44,7 +53,7 @@ class Snake:
         self.MAGENTA = (142, 63, 255)
         self.direction = 'down'
         self.north = False
-        self.south = False
+        self.south = True
         self.east = False
         self.west = False
 
@@ -125,7 +134,7 @@ class Game:
 
         # Game Constants
         self.MONITOR = pygame.display.Info()
-        self.SCREEN_DIMENSIONS = (math.ceil(self.MONITOR.current_w * 0.5206), math.ceil(self.MONITOR.current_h * 0.74))
+        self.SCREEN_DIMENSIONS = screen_dimensions(1000, 800)
         self.WINDOW = pygame.display.set_mode(self.SCREEN_DIMENSIONS)
         self.DUMMY_WINDOW = pygame.Surface((1000, 800))
         self.WIDTH, HEIGHT = self.SCREEN_DIMENSIONS
