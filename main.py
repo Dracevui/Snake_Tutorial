@@ -135,13 +135,15 @@ class Snake:
 
 
 class Assets:  # The class that handles loading in game assets
-    def __init__(self):
+    def __init__(self, parent_screen):
+        self.parent_screen = parent_screen
         self.background = pygame.transform.scale(
             (pygame.image.load("resources/water_background.png")), (WINDOW_W, WINDOW_H))
         self.game_over = pygame.image.load("resources/game_over.png")
         self.press_spacebar_surface = pygame.image.load("resources/press_spacebar2.png")
         self.icon = pygame.image.load("resources/icon.png")
         self.bgm = pygame.mixer.Sound("resources/bgm.wav")
+        self.resume_surface = pygame.image.load("resources/resume_button.png")
 
     def play_bgm(self):  # Plays the background music
         self.bgm.play(-1)
@@ -170,13 +172,14 @@ class Game:
         # Class Imports
         self.snake = Snake(self.DUMMY_WINDOW, 1)
         self.apple = Apple(self.DUMMY_WINDOW)
-        self.assets = Assets()
+        self.assets = Assets(self.DUMMY_WINDOW)
         pygame.display.set_icon(self.assets.icon)
 
         # Game Variables
         self.running = True
         self.game_active = True
         self.high_score = 0
+        self.paused = False
 
         # Onscreen Drawings
         self.snake.draw()
@@ -205,6 +208,26 @@ class Game:
         self.snake.west = False
         self.snake.east = False
         self.snake.west = False
+
+    def pause_game(self):
+        self.paused = True
+        resume_rect = self.assets.resume_surface.get_rect(center=self.WINDOW.get_rect().center)
+        while self.paused:
+            self.DUMMY_WINDOW.blit(self.assets.resume_surface, resume_rect)
+
+            mx, my = pygame.mouse.get_pos()
+
+            for event in pygame.event.get():
+                click = True if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 else False
+
+                if resume_rect.collidepoint((mx, my)) and click:
+                    self.paused = False
+
+                if event.type == pygame.QUIT:
+                    self.game_quit()
+
+            self.scale_window()
+            self.CLOCK.tick(self.FPS)
 
     def play(self):  # Handles the logic of when a game session is in play
         self.DUMMY_WINDOW.blit(self.assets.background, (0, 0))
@@ -255,7 +278,7 @@ class Game:
         while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                    self.running = False
+                    self.pause_game()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_UP:
                         self.snake.move_up()
