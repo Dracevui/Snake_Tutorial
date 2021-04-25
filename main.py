@@ -119,9 +119,7 @@ class Assets:
     def __init__(self):
         self.background = pygame.transform.scale((pygame.image.load("resources/water_background.png")), (1000, 800))
         self.game_over = pygame.image.load("resources/game_over.png")
-        self.game_over_rect = self.game_over.get_rect(center=(500, 420))
         self.press_spacebar_surface = pygame.image.load("resources/press_spacebar2.png")
-        self.press_spacebar_rect = self.press_spacebar_surface.get_rect(center=(500, 100))
         self.icon = pygame.image.load("resources/icon.png")
         self.bgm = pygame.mixer.Sound("resources/bgm.wav")
 
@@ -174,8 +172,8 @@ class Game:
                     self.game_active = True
                     self.game_clear()
             self.DUMMY_WINDOW.blit(self.assets.background, (0, 0))
-            self.DUMMY_WINDOW.blit(self.assets.game_over, self.assets.game_over_rect)
-            self.DUMMY_WINDOW.blit(self.assets.press_spacebar_surface, self.assets.press_spacebar_rect)
+            self.DUMMY_WINDOW.blit(self.assets.game_over, (268, 188))
+            self.DUMMY_WINDOW.blit(self.assets.press_spacebar_surface, (260, 21))
             self.display_score()
             self.scale_window()
 
@@ -217,16 +215,13 @@ class Game:
 
     def display_score(self):
         score = self.FONT.render(f"Score: {self.snake.length - 1}", True, self.WHITE)
-        score_rect = score.get_rect(topright=(990, 735))
-
         hi_score = self.FONT.render(f"High Score: {self.high_score}", True, self.WHITE)
-        hi_score_rect = hi_score.get_rect(center=(500, 720))
         
         self.high_score = update_score(self.snake.length - 1, self.high_score)
 
-        self.DUMMY_WINDOW.blit(score, score_rect)
+        self.DUMMY_WINDOW.blit(score, (823, 735))
         if not self.game_active:
-            self.DUMMY_WINDOW.blit(hi_score, hi_score_rect)
+            self.DUMMY_WINDOW.blit(hi_score, (365, 690))
 
     def run(self):
         self.assets.play_bgm()
