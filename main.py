@@ -4,6 +4,7 @@ import math
 import random
 
 SIZE = 40
+WINDOW_W, WINDOW_H = 1000, 800
 
 
 def screen_dimensions(x, y):  # Lets me easily change the dimensions of the game window
@@ -118,22 +119,23 @@ class Snake:
         self.draw()
 
     def walk_through_walls(self):  # Makes the snake come out the other side when they hit a wall
-        if self.x[0] >= 1000:
-            self.x[0] -= 1000
+        if self.x[0] >= WINDOW_W:
+            self.x[0] -= WINDOW_W
 
         if self.x[0] < 0:
-            self.x[0] += 1000
+            self.x[0] += WINDOW_W
 
-        if self.y[0] >= 800:
-            self.y[0] -= 800
+        if self.y[0] >= WINDOW_H:
+            self.y[0] -= WINDOW_H
 
         if self.y[0] < 0:
-            self.y[0] += 800
+            self.y[0] += WINDOW_H
 
 
 class Assets:  # The class that handles loading in game assets
     def __init__(self):
-        self.background = pygame.transform.scale((pygame.image.load("resources/water_background.png")), (1000, 800))
+        self.background = pygame.transform.scale(
+            (pygame.image.load("resources/water_background.png")), (WINDOW_W, WINDOW_H))
         self.game_over = pygame.image.load("resources/game_over.png")
         self.press_spacebar_surface = pygame.image.load("resources/press_spacebar2.png")
         self.icon = pygame.image.load("resources/icon.png")
@@ -151,9 +153,9 @@ class Game:
 
         # Game Constants
         self.MONITOR = pygame.display.Info()
-        self.SCREEN_DIMENSIONS = screen_dimensions(1000, 800)
+        self.SCREEN_DIMENSIONS = screen_dimensions(WINDOW_W, WINDOW_H)
         self.WINDOW = pygame.display.set_mode(self.SCREEN_DIMENSIONS)
-        self.DUMMY_WINDOW = pygame.Surface((1000, 800))
+        self.DUMMY_WINDOW = pygame.Surface((WINDOW_W, WINDOW_H))
         self.WIDTH, HEIGHT = self.SCREEN_DIMENSIONS
         self.WINDOW_WIDTH = self.WINDOW.get_width()
         self.WINDOW_HEIGHT = self.WINDOW.get_height()
@@ -242,7 +244,7 @@ class Game:
         
         self.high_score = update_score(self.snake.length - 1, self.high_score)
 
-        self.DUMMY_WINDOW.blit(score, (823, 735))
+        self.DUMMY_WINDOW.blit(score, (800, 735))
         if not self.game_active:
             self.DUMMY_WINDOW.blit(hi_score, (365, 690))
 
