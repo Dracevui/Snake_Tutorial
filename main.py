@@ -48,8 +48,10 @@ class Snake:
         self.length = length
         self.parent_screen = parent_screen
         self.block = pygame.image.load("resources/block.jpg").convert_alpha()
-        self.x = [SIZE] * length
-        self.y = [SIZE] * length
+        self.random_block_x = random.randint(0, 24) * SIZE
+        self.random_block_y = random.randint(0, 19) * SIZE
+        self.x = [self.random_block_x] * length
+        self.y = [self.random_block_y] * length
         self.direction = ""
         self.north = False
         self.south = False
