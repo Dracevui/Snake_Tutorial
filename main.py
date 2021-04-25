@@ -117,6 +117,19 @@ class Snake:
 
         self.draw()
 
+    def walk_through_walls(self):  # Makes the snake come out the other side when they hit a wall
+        if self.x[0] >= 1000:
+            self.x[0] -= 1000
+
+        if self.x[0] < 0:
+            self.x[0] += 1000
+
+        if self.y[0] >= 800:
+            self.y[0] -= 800
+
+        if self.y[0] < 0:
+            self.y[0] += 800
+
 
 class Assets:  # The class that handles loading in game assets
     def __init__(self):
@@ -145,6 +158,7 @@ class Game:
         self.WINDOW_WIDTH = self.WINDOW.get_width()
         self.WINDOW_HEIGHT = self.WINDOW.get_height()
         self.FONT = pygame.font.SysFont('Impact', 50)
+        self.SCORE_FONT = pygame.font.SysFont('Impact', 30)
         self.WHITE = (255, 255, 255)
         self.CLOCK = pygame.time.Clock()
         self.FPS = 10
@@ -199,6 +213,8 @@ class Game:
         for i in range(3, self.snake.length):
             if self.check_collision(self.snake.x[0], self.snake.y[0], self.snake.x[i], self.snake.y[i]):
                 self.game_over()
+
+        self.snake.walk_through_walls()
 
         self.display_score()
         self.apple.draw()
