@@ -23,7 +23,7 @@ def update_score(score, hi_score):
 
 class Apple:
     def __init__(self, parent_screen):
-        self.image = pygame.transform.scale((pygame.image.load("resources/pizza.png").convert_alpha()), (40, 40))
+        self.image = pygame.transform.scale((pygame.image.load("resources/pizza_bubble.png").convert_alpha()), (40, 40))
         self.crunch = pygame.mixer.Sound("resources/crunch.wav")
         self.parent_screen = parent_screen
         self.x = SIZE * 3
@@ -45,12 +45,12 @@ class Snake:
     def __init__(self, parent_screen, length):
         self.length = length
         self.parent_screen = parent_screen
-        self.block = pygame.image.load("resources/block.jpg").convert()
+        self.block = pygame.image.load("resources/block.jpg").convert_alpha()
         self.x = [SIZE] * length
         self.y = [SIZE] * length
         self.WHITE = (255, 255, 255)
         self.MAGENTA = (142, 63, 255)
-        self.direction = 'down'
+        self.direction = ""
         self.north = False
         self.south = True
         self.east = False
@@ -119,9 +119,9 @@ class Assets:
     def __init__(self):
         self.background = pygame.transform.scale((pygame.image.load("resources/water_background.png")), (1000, 800))
         self.game_over = pygame.image.load("resources/game_over.png")
-        self.game_over_rect = self.game_over.get_rect(center=(500, 400))
+        self.game_over_rect = self.game_over.get_rect(center=(500, 420))
         self.press_spacebar_surface = pygame.image.load("resources/press_spacebar2.png")
-        self.press_spacebar_rect = self.press_spacebar_surface.get_rect(center=(500, 80))
+        self.press_spacebar_rect = self.press_spacebar_surface.get_rect(center=(500, 100))
         self.icon = pygame.image.load("resources/icon.png")
         self.bgm = pygame.mixer.Sound("resources/bgm.wav")
 
@@ -181,6 +181,7 @@ class Game:
 
     def game_clear(self):
         self.snake.length = 1
+        self.snake.direction = ""
 
     def play(self):
         self.DUMMY_WINDOW.blit(self.assets.background, (0, 0))
@@ -219,7 +220,7 @@ class Game:
         score_rect = score.get_rect(topright=(990, 735))
 
         hi_score = self.FONT.render(f"High Score: {self.high_score}", True, self.WHITE)
-        hi_score_rect = hi_score.get_rect(center=(500, 700))
+        hi_score_rect = hi_score.get_rect(center=(500, 720))
         
         self.high_score = update_score(self.snake.length - 1, self.high_score)
 
