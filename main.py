@@ -213,7 +213,7 @@ class Game:
         self.paused = True
         resume_rect = self.assets.resume_surface.get_rect(center=self.WINDOW.get_rect().center)
         while self.paused:
-            self.DUMMY_WINDOW.blit(self.assets.resume_surface, resume_rect)
+            self.DUMMY_WINDOW.blit(self.assets.resume_surface, (294, 330))
 
             mx, my = pygame.mouse.get_pos()
 
